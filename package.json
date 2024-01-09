@@ -1,0 +1,16 @@
+{
+    "name": "sounarch-selfot",
+    "version": "1.0.0",
+    "description": "2024 Discord Selfbot",
+    "main": "index.js",
+    "scripts": {
+        "dev": "nodemon ."
+    },
+    "author": "Souna",
+    "license": "MIT",
+    "dependencies": {
+        "discord.js-selfbot-v13": "^2.15.0",
+        "dotenv": "^16.3.1",
+        "path": "^0.12.7"
+    }
+}
