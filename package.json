@@ -9,8 +9,11 @@
     "author": "Souna",
     "license": "MIT",
     "dependencies": {
+        "@discordjs/voice": "^0.16.1",
         "discord.js-selfbot-v13": "^2.15.0",
         "dotenv": "^16.3.1",
-        "path": "^0.12.7"
+        "libsodium-wrappers": "^0.7.13",
+        "path": "^0.12.7",
+        "ytdl-core": "^4.11.5"
     }
 }
