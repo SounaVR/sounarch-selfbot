@@ -42,7 +42,6 @@ client.on('ready', async () => {
 });
   
 client.on("messageCreate", async message => {
-    if (message.author.id !== "436310611748454401") return;
     const prefix = "!";
     
     const args = message.content.slice(prefix.length).trim().split(/ +/g);
