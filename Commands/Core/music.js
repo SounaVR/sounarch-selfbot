@@ -1,4 +1,4 @@
-const { exec } = require ('child_process');
+const { exec } = require('child_process');
 const { createAudioPlayer, AudioPlayerStatus, NoSubscriberBehavior, createAudioResource, joinVoiceChannel, getVoiceConnection, StreamType } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
 const fs = require('fs');
@@ -13,20 +13,20 @@ exports.run = async (client, message, args) => {
     switch (args[0]) {
         case "join": case "j":
             joinVoiceChannel({
-                channelId: args[1],
+                channelId: "1190025807683387482",
                 guildId: message.guild.id,
                 adapterCreator: message.guild.voiceAdapterCreator
             });
 
             connection = getVoiceConnection(message.guild.id);
 
-            message.edit(`Successfully joined voice channel: <#${connection.joinConfig.channelId}>`);
+            message.channel.send(`✅ Successfully joined voice channel: <#${connection.joinConfig.channelId}> 😎`);
             break;
     
         case "leave": case "l":
             let channelid = connection.joinConfig.channelId;
             connection.destroy();
-            message.edit(`Successfully left voice channel: <#${channelid}>`);
+            message.channel.send(`✅ Successfully left voice channel: <#${channelid}> 👋`);
             break;
 
         case "play": case "p":
@@ -39,36 +39,40 @@ exports.run = async (client, message, args) => {
         case "stop": case "s":
             if (connection) {
                 queue.delete(message.guild.id);
-                message.edit("Music stopped.");
+                message.channel.send("⏹️ Music stopped.");
+                player.stop();
             }
             break;
 
         case "pause": case "pa":
             if (connection) {
                 player.pause();
-                message.edit("Music paused.");
+                message.channel.send("⏸️ Music paused.");
             }
             break;
 
         case "resume": case "r":
             if (connection) {
                 player.unpause();
-                message.edit("Music resumed.");
+                message.channel.send("▶️ Music resumed.");
             }
             break;
 
         case "queue": case "q":
-            if (!serverQueue) message.edit("Queue is empty.");
+            if (!serverQueue || !serverQueue.songs.length) message.channel.send(":x: Queue is empty.");
             else {
-                console.log("server queue " + JSON.stringify(serverQueue));
+                const queue = generateQueue(serverQueue.songs);
+
+                message.channel.send(queue[0].join("\n"));
             }
             break;
 
         case "skip":
             if (connection) {
+                message.channel.send("⏭️ Music skipped.");
                 player.stop();
             }
-            break;
+            break;  
     }
 
     function search(query) {
@@ -121,7 +125,7 @@ exports.run = async (client, message, args) => {
                         queue.set(message.guild.id, constructor);
 
                         constructor.songs.push(song);
-                        message.edit(`The following song has been added: ${song.title}`);
+                        message.channel.send(`✅ The following song has been added: [${song.title}](<${song.url}>)`);
                         
                         const audioPlayer = createAudioPlayer({
                             behaviors: {
@@ -136,12 +140,14 @@ exports.run = async (client, message, args) => {
                         player.on(AudioPlayerStatus.Idle, () => {
                             const serverQueue = queue.get(message.guild.id);
 
+                            if (!serverQueue) return;
+
                             serverQueue.songs.shift();
                             if (serverQueue.songs.length) play(serverQueue.songs[0]);
                         });
                     } else {
                         serverQueue.songs.push(song);
-                        return message.edit(`The following song has been added: ${song.title}`);
+                        return message.channel.send(`✅ The following song has been added: [${song.title}](<${song.url}>)`);
                     }           
                 } catch (err) {
                     console.error(err);
@@ -150,12 +156,28 @@ exports.run = async (client, message, args) => {
         });
     }
 
-    function play(song) {
+    async function play(song) {
         const stream = ytdl(song.url, { filter: 'audioonly' });
         const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
+
         player.play(resource);
 
-        message.channel.send(`Playing \`${song.title}\``);
+        message.channel.send(`🎵 Playing [${song.title}](<${song.url}>)`);
+    }
+
+    function generateQueue(queue) {
+        const uwu = [];
+        let k = 10;
+        for (let i = 0; i < queue.length; i += 10) {
+            const current = queue.slice(i, k);
+            let j = i;
+            k += 10;
+            const info = current.map(track => `${++j}. **[${track.title}](<${track.url}>)**`);
+
+            uwu.push(info)
+        }
+
+        return uwu;
     }
 };
 
